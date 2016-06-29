@@ -14,6 +14,8 @@ def fix_24(item):
     if '24:' in item[0]:
         item[0] = item[0].replace('24:00', '00:00')
         date_increase = 1
+    item[1] = float(item[1])
+    item[2] = float(item[2])
     item[0] = datetime.datetime.strptime(item[0], '%Y-%m-%d %H:%M') + datetime.timedelta(days=date_increase)
     return item
 
@@ -24,17 +26,23 @@ def all_for_day(date, dc):
 
 def my_plot(*data):
     fig, ax = plt.subplots()
-    ax.plot_date(*data)
+    ax.plot_date(*data, '-')
     # ax.set_xlim(dc[0, 0], dc[-1, 0])
     # ax.xaxis.set_major_locator(DayLocator())
     # ax.xaxis.set_minor_locator(HourLocator(scipy.arange(0, 25, 6)))
-    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+    # ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+    ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
     ax.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
     ax.autoscale_view()
     ax.grid()
     fig.autofmt_xdate()
-    plt.show()
 
+
+def corr_search():
+    corr = scipy.array()
+    for date in date_tuple[1:]:
+        day_dc = all_for_day(min_date + datetime.timedelta(days=21), dc)
+    return corr
 
 if __name__ == '__main__':
     es = open_csv('ES.csv')[1:]
@@ -42,7 +50,16 @@ if __name__ == '__main__':
     dc = scipy.array(es)
     date_tuple = set([item[0].date() for item in dc])
     min_date = min(date_tuple)
+
     dc1 = all_for_day(min_date, dc)
     my_plot(dc1[:, 0], dc1[:, 2])
-    dc2 = all_for_day(min_date+datetime.timedelta(days=20), dc)
+
+
+    dc2 = all_for_day(min_date+datetime.timedelta(days=21), dc)
     my_plot(dc2[:, 0], dc2[:, 2])
+    # print(len(dc1[:,2]))
+    dc3 = dc1[:, 2]*dc2[:, 2]
+    dc3 = sum(dc3)/len(dc3)
+    print(dc3)
+    # my_plot(dc1[:, 0], dc3)
+    plt.show()
