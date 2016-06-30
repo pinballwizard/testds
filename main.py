@@ -31,18 +31,19 @@ def my_plot(*data):
     # ax.xaxis.set_major_locator(DayLocator())
     # ax.xaxis.set_minor_locator(HourLocator(scipy.arange(0, 25, 6)))
     # ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
-    ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
+    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
     ax.fmt_xdata = DateFormatter('%Y-%m-%d %H:%M:%S')
     ax.autoscale_view()
     ax.grid()
     fig.autofmt_xdate()
 
 
-def corr_search():
-    corr = scipy.array()
-    for date in date_tuple[1:]:
-        day_dc = all_for_day(min_date + datetime.timedelta(days=21), dc)
-    return corr
+def correlation_search():
+    first_day = all_for_day(min_date, dc)
+    mfd = scipy.mat(first_day[:, 2]).T
+    mdc = scipy.mat(dc[:, 2])
+    correlation = scipy.sum(mfd * mdc, 0)/len(dc)
+    return correlation.T
 
 if __name__ == '__main__':
     es = open_csv('ES.csv')[1:]
@@ -52,14 +53,14 @@ if __name__ == '__main__':
     min_date = min(date_tuple)
 
     dc1 = all_for_day(min_date, dc)
-    my_plot(dc1[:, 0], dc1[:, 2])
-
+    # my_plot(dc1[:, 0], dc1[:, 2])
 
     dc2 = all_for_day(min_date+datetime.timedelta(days=21), dc)
-    my_plot(dc2[:, 0], dc2[:, 2])
+    # my_plot(dc2[:, 0], dc2[:, 2])
     # print(len(dc1[:,2]))
-    dc3 = dc1[:, 2]*dc2[:, 2]
-    dc3 = sum(dc3)/len(dc3)
-    print(dc3)
-    # my_plot(dc1[:, 0], dc3)
+    corr = correlation_search()
+    # print(dc[:, 0])
+    # print(scipy.ravel(corr.T))
+    my_plot(dc[:, 0], corr)
+    my_plot(dc[:, 0], dc[:, 2]-corr)
     plt.show()
